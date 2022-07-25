@@ -1,6 +1,7 @@
 package com.mb.ecommerce.service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import com.mb.ecommerce.dao.RoleDao;
 import com.mb.ecommerce.dao.UserDao;
 import com.mb.ecommerce.entity.Role;
 import com.mb.ecommerce.entity.User;
+import com.mb.ecommerce.exception.BusinessException;
+import com.mb.ecommerce.exception.UserAlreadyExistException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,8 +35,21 @@ public class UserServiceImpl implements UserService {
 		roles.add(role);
 		user.setRole(roles);
 		
-		user.setUserPassword(getEncodedPassword(user.getUserPassword()));	
-		return userDao.save(user);
+		Optional<User> existingUser=userDao.findById(user.getUserName());
+		if(existingUser.isEmpty()) {
+			try {
+			user.setUserPassword(getEncodedPassword(user.getUserPassword()));	
+			return userDao.save(user);			
+		}
+			catch(Exception e) {
+				
+				throw new BusinessException("700",e.getMessage());
+			}
+		}
+		else
+		{
+			throw new UserAlreadyExistException("User Already Exist");
+		}
 	}
 	
 	@Override
@@ -43,9 +59,23 @@ public class UserServiceImpl implements UserService {
 		Set<Role> roles=new HashSet<>();
 		roles.add(role);
 		user.setRole(roles);
+		Optional<User> existingUser=userDao.findById(user.getUserName());
+		if(existingUser.isEmpty()) {
+			try {
+			user.setUserPassword(getEncodedPassword(user.getUserPassword()));	
+			return userDao.save(user);			
+		}
+			catch(Exception e) {
+				
+				throw new BusinessException("700", e.getMessage());
+			}
+		}
+		else
+		{
+			throw new UserAlreadyExistException("Admin Already Exist");
+		}
 		
-		user.setUserPassword(getEncodedPassword(user.getUserPassword()));	
-		return userDao.save(user);
+		
 	}
 	
 	@Override
@@ -58,18 +88,7 @@ public class UserServiceImpl implements UserService {
 		Role userRole =new Role();
 		userRole.setRoleName("User");
 		userRole.setRoleDescription("Default Role for newly created record");
-		roleDao.save(userRole);
-		
-//		User adminUser=new User();
-//		adminUser.setUserFirstName("admin");
-//		adminUser.setUserLastName("admin");
-//		adminUser.setUserName("Admin123");
-//		adminUser.setUserPassword(getEncodedPassword("Admin@123"));
-//		Set<Role> adminRoles=new HashSet<>();
-//		adminRoles.add(adminRole);
-//		adminUser.setRole(adminRoles);
-//		userDao.save(adminUser);
-		
+		roleDao.save(userRole);	
 	}
 	
 	@Override

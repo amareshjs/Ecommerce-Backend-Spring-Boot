@@ -35,6 +35,14 @@ public class GlobalExceptionHandler {
 				e.getMessage());
 	}
 	
+	@ExceptionHandler(value= {BusinessException.class})
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handleBusinessException(Exception e) {
+		return new ErrorResponse(new Date(), "Something Went Wrong",
+				e.getMessage(),HttpStatus.BAD_REQUEST.value(),
+				e.getMessage());
+	}
+	
 	
 
 }

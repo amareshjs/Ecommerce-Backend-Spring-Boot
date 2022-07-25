@@ -8,5 +8,6 @@ public interface UserService {
 	public void initRolesAndUser();
 	public String getEncodedPassword(String password);
 	public User registerNewAdmin(User user);
+	
 
 }

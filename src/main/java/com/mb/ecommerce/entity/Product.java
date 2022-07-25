@@ -2,7 +2,10 @@ package com.mb.ecommerce.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.EntityListeners;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -10,9 +13,11 @@ import com.mb.ecommerce.audit.Auditable;
 
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-public class Products extends Auditable<String> {
+@Table(name="products")
+public class Product extends Auditable<String> {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String productName;
 	private String productCategory;
@@ -21,12 +26,13 @@ public class Products extends Auditable<String> {
 	private int productWidth;
 	private int productHeight;
 	private String productType;
+	private String productBrand;
 
-	public Products() {
+	public Product() {
 	}
 
-	public Products(long id, String productName, String productCategory, String productDiscription, float productPrice,
-			int productWidth, int productHeight, String productType) {
+	public Product(long id, String productName, String productCategory, String productDiscription, float productPrice,
+			int productWidth, int productHeight, String productType,String productBrand) {
 		super();
 		this.id = id;
 		this.productName = productName;
@@ -36,6 +42,16 @@ public class Products extends Auditable<String> {
 		this.productWidth = productWidth;
 		this.productHeight = productHeight;
 		this.productType = productType;
+		this.productBrand=productBrand;
+		
+	}
+
+	public String getProductBrand() {
+		return productBrand;
+	}
+
+	public void setProductBrand(String productBrand) {
+		this.productBrand = productBrand;
 	}
 
 	public long getId() {

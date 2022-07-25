@@ -1,61 +1,41 @@
 package com.mb.ecommerce.controller;
 
-import javax.annotation.PostConstruct;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mb.ecommerce.entity.JwtRequest;
-import com.mb.ecommerce.entity.JwtResponse;
-import com.mb.ecommerce.entity.User;
-import com.mb.ecommerce.service.JwtService;
-import com.mb.ecommerce.service.UserServiceImpl;
+import com.mb.ecommerce.entity.Product;
+import com.mb.ecommerce.service.ProductService;
 
 @RestController
+@RequestMapping("/api/v1/products")
+@PreAuthorize("hasAnyRole('Admin','User')")
 public class UserController {
 	
 	@Autowired
-	private UserServiceImpl userServiceImpl;
+	private ProductService productService;
 	
-	@Autowired
-	private JwtService jwtService;
+	//search products by name,brand,etc,
+	@GetMapping("/search/{keyword}")
+    public List<Product> search(@PathVariable String keyword) {
+        return productService.search(keyword);
+    }
 	
-	@PostConstruct
-	public void initRolesAndUsers() {
-		userServiceImpl.initRolesAndUser();
-	}
+	//filter products by price range,
+	@GetMapping("/filter/{min}/{max}")
+    public List<Product> filterByPrice(@PathVariable int min,@PathVariable int max) {
+        return productService.filterByPrice(min, max);
+    }
 	
-	
-	@PostMapping({"/signup"})
-	public User registerNewUser(@RequestBody User user) {
-		return userServiceImpl.registerNewUser(user);
-	}
-	
-	@PostMapping({"/signup/admin"})
-	public User registerNewAdmin(@RequestBody User user) {
-		return userServiceImpl.registerNewAdmin(user);
-	}
-	
-	@PostMapping({"/signin"})
-	public JwtResponse createJwtToken(@RequestBody JwtRequest jwtRequest) throws Exception {
-		
-		return jwtService.createJwtToken(jwtRequest);
-		
-	}
-	
-	@GetMapping({"/admin/hello"})
-	@PreAuthorize("hasRole('Admin')")
-	public String adminHello() {
-		return "welcome to Admin Hello";
-	}
-	
-	@GetMapping({"/user/hello"})
-	@PreAuthorize("hasAnyRole('User','Admin')")
-	public String userHello() {
-		return "welcome to Admin and User Hello";
-	}
+	@GetMapping("/{id}")
+    public Optional<Product> findById(@PathVariable long id) {
+        return productService.getProductDetails(id);
+    }
+
 }
